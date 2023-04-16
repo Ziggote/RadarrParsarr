@@ -12,4 +12,8 @@ When a torrent gets removed from Radarr, it automatically starts a new search fo
 
 I set up my system to run the script every 10 minutes via Windows Task Scheduler.
 
-this way, the sctipt is not always running.  Rather it is run on a schedule defined by the user and the information is stored and edited in a separate file.
+This way, the sctipt is not always running.  Rather it is run on a schedule defined by the user and the information is stored and edited in a separate file.
+
+You will have to Put your own API key in on line 5.
+
+api_key = "Your-API-Key"
