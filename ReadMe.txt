@@ -17,3 +17,5 @@ This way, the sctipt is not always running.  Rather it is run on a schedule defi
 You will have to Put your own API key in on line 5.
 
 api_key = "Your-API-Key"
+
+If you are having issues with the Task Scheduler not running the script, Make sure the CSV file is in the same directory as the script.  
