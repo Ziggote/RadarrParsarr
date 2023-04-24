@@ -1,32 +1,42 @@
+import os
 import requests
 import csv
+
+# Check if the CSV file exists, and if not, create it with the header
+csv_file = "radarTestarrInfo.csv"
+if not os.path.isfile(csv_file):
+    with open(csv_file, "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(
+            ["Title", "Download ID", "ID", "Sizeleft", "Size", "Status", "Strike"]
+        )
+
 
 # API key & endpoint
 api_key = "Your-API-Key"
 headers = {"X-Api-Key": api_key}
-
 response = requests.get("http://localhost:7878/api/v3/queue", headers=headers)
 if response.status_code == 200:
-    data = response.json()
+    data = response.json().get("records", [])
 
     # Keep track of strikes for each torrent
     strikes = {}
 
-    with open("radarrTestarrInfo.csv", "r") as file:
+    with open("radarTestarrInfo.csv", "r") as file:
         reader = csv.DictReader(file)
         for row in reader:
             # Read the existing strikes for each torrent from the file
             download_id = row["Download ID"]
             strikes[download_id] = int(row["Strike"])
 
-    with open("radarrTestarrInfo.csv", "w", newline="") as file:
+    with open("radarTestarrInfo.csv", "w", newline="") as file:
         writer = csv.writer(file)
         writer.writerow(
             ["Title", "Download ID", "ID", "Sizeleft", "Size", "Status", "Strike"]
         )
         for torrent in data:
             title = torrent.get("title", "")
-            download_id = torrent.get("downloadId", "")[-5:]
+            download_id = torrent.get("downloadId", "")
             id = torrent.get("id", "")
             sizeleft = torrent.get("sizeleft", "")
             size = torrent.get("size", "")
@@ -36,12 +46,12 @@ if response.status_code == 200:
             torrent_strikes = {download_id: strikes.get(download_id, 0)}
 
             # Increment the strike count for the current torrent if its status is 'Warning'
-            if status == "Warning":
+            if status == "Warning" or status == "Queued":
                 torrent_strikes[download_id] += 1
                 strikes[download_id] = torrent_strikes[download_id]
 
             # Remove a strike if the status is 'Downloading'
-            if status == "Downloading":
+            if status == "downloading":
                 if torrent_strikes[download_id] > 0:
                     torrent_strikes[download_id] -= 1
                     strikes[download_id] = torrent_strikes[download_id]
